@@ -14,8 +14,10 @@ def getCitiesOfState(state_id):
     Retrieves the list of all Cities in a State
     or create a new City object
     """
+    state = storage.get(State, state_id)
+    if state is None:
+        abort(404)
     if request.method == 'GET':
-        state = storage.get(State, state_id)
         cities = state.cities
         cities_dicts = list(map(lambda x: x.to_dict(), cities))
         return jsonify(cities_dicts)
@@ -25,9 +27,6 @@ def getCitiesOfState(state_id):
             abort(400, {'Not a JSON'})
         if 'name' not in body:
             abort(400, {'Missing name'})
-        if state_id not in list(map(lambda x: x.id,
-                                    storage.all(State).values())):
-            abort(404)
 
         newCity = City(name=body['name'], state_id=state_id)
         storage.new(newCity)
@@ -55,7 +54,7 @@ def getCityById(city_id):
             body = request.get_json()
             if body is None:
                 abort(400, {'Not a JSON'})
-            ignored = ["id", "created_at", "updated_at"]
+            ignored = ["id", "created_at", "updated_at", "state_id"]
             for key, value in body.items():
                 if key not in ignored:
                     setattr(city, key, value)
