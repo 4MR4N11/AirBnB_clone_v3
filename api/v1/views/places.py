@@ -13,7 +13,7 @@ from models.user import User
 def getPlacesOfCity(city_id):
     """
     Retrieves the list of all Places in a City
-    or create a new Place object
+    or create a new Place object.
     """
     city = storage.get(City, city_id)
     if city is None:
